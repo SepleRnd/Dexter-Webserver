@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}My Flask App{% endblock %}</title>
+        <link rel="icon" href="{{ url_for('static', filename='asset/TitleLogo.png') }}" type="image/x-icon" >
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        
+
+        {% if request.endpoint in ['device_config', 'powerzone_config'] %}
+            <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/device_config.css') }}">
+            <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+        {% elif request.endpoint in ['advanced', 'maintenance'] %}
+            <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/advanced.css') }}">
+            <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        
+        {% elif request.endpoint == 'system_test' %}
+            <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/system_test.css') }}">
+            <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+              
+        {% elif request.endpoint == 'general' %}
+            <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/general.css') }}">
+            <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+        {% elif request.endpoint == 'logs' %}
+            <link rel="stylesheet" href="{{url_for('static',filename='css/logs.css')}}">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+        {% elif request.endpoint == 'reports' %}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+            <link rel="stylesheet" href="{{url_for('static',filename='css/reports.css')}}">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        {% elif request.endpoint in ['net_eSim','gnss', 'lan', 'net_gsm'] %}
+            <link rel="stylesheet" href="{{url_for('static',filename='css/network.css')}}">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+        {% elif request.endpoint == 'come_soon' %}
+            <link rel="stylesheet" href="{{url_for('static',filename='css/coming_soon.css')}}">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+        {% endif %}
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+
+        <div class="topnav" id="myTopnav">
+            <img class="logo" src="{{url_for('static',filename='asset/Dexter2.png')}}" style="margin-top: 5px;">
+          
+          
+            <div class="dropdown2">
+                <button class="dropbtn2" style="margin-right: 60px;">
+                    <i class="fa fa-bars"></i> <!-- Hamburger icon -->
+                </button>
+                
+                <div class="dropdown-content2">
+                    {% if user %}
+                        <h3><a><i class="fas fa-user"></i> {{ user[0] }}</a></h3>
+                    {% endif %}
+                    <hr>
+                    <a href="/logout"> <i class="fa fa-sign-out-alt"></i> Logout</a>
+                    
+                </div>
+            </div>
+            
+            <div class="dropdown2" style="margin-right: 20px;">
+                <button class="dropbtn2">
+                    <i class="fa fa-upload"></i> <!-- upload icon -->
+                </button>
+                
+            <div class="dropdown-content2" style="padding: 25px;">
+                
+                <input type="file" name="file" />
+            </div>
+            </div>
+          
+            <div class="dropdown2"  style="margin-right: 20px;">
+                <button class="dropbtn2">
+                   <i class="fa fa-power-off"></i> <!-- Power icon -->
+                </button>
+                <div class="dropdown-content2">
+                    <a href="/terminate"  onclick="terminate()"> <i class="fa fa-power-off"></i> Power Off</a>
+                    <hr>
+                    <a href="/restart"> <i class="fa fa-sync-alt"></i> Reboot</a>
+                </div>
+            </div>
+            
+            <div class="dropdown2" style="margin-right: 20px;">
+                <button class="dropbtn2">
+                    <i class="fa fa-bell"></i> <!-- bell icon -->
+                </button>
+                
+            <div class="dropdown-content2">
+                <a><p>Notification 1</p></a>
+                <a><p>Notification 2</p></a>
+                <a><p>Notification 3</p></a>
+            </div>
+            </div>
+            
+          </div>
+        <!-- side-menu starts -->
+
+        <div class="side-menu">
+
+            <div class="menu-item">
+                <a href="#" class="submenu-toggle">Device Configuration</a>
+                <div class="submenu">
+                    <a href="/device_config">zone Settings</a>
+                    <a href="/powerzone_config">Power Zone Settings</a>
+                    <a href="/come_soon">Output Management</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a href="#" class="submenu-toggle">Events & Logs</a>
+                <div class="submenu">
+                    <a href="/logs">Logs</a>
+                    <a href="/reports">Events & Report</a>
+
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a href="#" class="submenu-toggle">Network Settings</a>
+                <div class="submenu">
+                    <a href="/net_eSim">e-Sim Settings</a>
+                    <a href="/gnss">GNSS Settings</a>
+                    <a href="/lan">Lan Setup</a>
+                    <a href="/net_gsm">GSM Settings</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a href="#" class="submenu-toggle">Device Integration</a>
+                <div class="submenu">
+                    <a href="/come_soon">Integration Settings</a>
+                    <a href="/come_soon">Device Management</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a href="#" class="submenu-toggle">Power Management</a>
+                <div class="submenu">
+                    <a href="/come_soon">Low Battery</a>
+                    <a href="/come_soon">Power Backup Config</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a href="#" class="submenu-toggle">System Settings</a>
+                <div class="submenu">
+                    <a href="/general">General Maintenance</a>
+                    <a href="/advanced">Advanced Maintenance</a>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <a href="/system_test">System Test</a>
+
+            </div>
+
+            <div class="menu-item">
+                <a href="/come_soon" class="submenu-toggle">Protocol
+                    Settings</a>
+            </div>
+
+            <div class="menu-item">
+                <a href="/come_soon" ">Device Provisioning</a>
+            </div>
+
+            <div class="menu-item">
+                <a href="/come_soon">OTA Update</a>
+            </div>
+
+        </div>
+
+        {% block body %}
+
+        {% endblock %}
+
+    
+    <script>
+        function restart() {
+            fetch('/restart', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => alert(data))
+                .catch(error => console.error('Error:', error));
+        }
+        
+         function terminate() {
+                fetch('/terminate', { method: 'POST' })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('loading-screen').style.display = 'none';
+                    });
+            }
+            
+    // Toggle dropdown on button click
+    document.querySelector('.dropbtn2').addEventListener('click', function(event) {
+    event.stopPropagation();
+    let dropdownContent = document.querySelector('.dropdown-content2');
+    if (dropdownContent.style.display === 'block') {
+        dropdownContent.style.display = 'none';
+    } else {
+        dropdownContent.style.display = 'block';
+    }
+});
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn2')) {
+        let dropdownContent = document.querySelector('.dropdown-content2');
+        if (dropdownContent.style.display === 'block') {
+            dropdownContent.style.display = 'none';
+        }
+    }
+};
+            
+    </script>
+
+    </body>
+</html>

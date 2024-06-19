@@ -1,0 +1,263 @@
+{% extends "layout.html" %}
+{% block title %}Device Zone Settings{% endblock %}
+{% block body %}
+
+<div class="main-content">
+    <div class="container">
+        <div class="column">
+            <h1>Zone Configuration</h1>
+            <div id="leftZones"></div>
+        </div>
+        <div class="column">
+            <div id="rightZones"></div>
+        </div>
+        <button class="save-button" onclick="saveZones()">Save Changes</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const devices = ['Burglar Alarm', 'Fire Alarm', 'Time Lock', 'Access Controll'];
+            const cctvDevices = ['CCTV'];
+            let zones = [];
+
+            window.initializeZones = function() {
+                const leftZonesContainer = document.getElementById('leftZones');
+                const rightZonesContainer = document.getElementById('rightZones');
+
+                if (!leftZonesContainer || !rightZonesContainer) {
+                    console.error("Error: Zone containers not found");
+                    return;
+                }
+
+                leftZonesContainer.innerHTML = '';
+                rightZonesContainer.innerHTML = '';
+
+                zones.forEach(zone => {
+                    const zoneDiv = document.createElement('div');
+                    zoneDiv.className = 'zone';
+                    zoneDiv.id = `zone-${zone.zoneId}`;
+
+                    // Determine the options based on the zoneId
+                    const options = [7, 8, 15, 16].includes(zone.zoneId) ? cctvDevices : devices;
+
+                    zoneDiv.innerHTML = `
+                        <label for="zone-${zone.zoneId}-select">Zone ${zone.zoneId}</label>
+                        <div class="toggle-switch-container">
+                            <div class="toggle-switch">
+                                <label class="toggle-slider">
+                                    <input type="checkbox" ${zone.activated ? 'checked' : ''} onchange="toggleZone(${zone.zoneId})">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <select id="zone-${zone.zoneId}-select" onchange="handleDeviceChange(${zone.zoneId})" ${zone.activated ? '' : 'disabled'}>
+                                <option value="" ${!zone.selectedDevice ? 'selected' : ''} disabled>Select Device</option>
+                                ${options.map(device => `<option value="${device}" ${zone.selectedDevice === device ? 'selected' : ''}>${device.toUpperCase()}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="buzzer-switch-container">
+                            <div class="buzzer-switch">
+                                <input type="checkbox" id="zone-${zone.zoneId}-buzzer-switch" ${zone.buzzerStatus === 'on' ? 'checked' : ''} onchange="toggleBuzzer(${zone.zoneId})" ${zone.activated && zone.selectedDevice ? '' : 'disabled'}>
+                                <label for="zone-${zone.zoneId}-buzzer-switch">Buzzer: ${zone.buzzerStatus.charAt(0).toUpperCase() + zone.buzzerStatus.slice(1)}</label>
+                            </div>
+                        </div>
+                    `;
+                    if (zone.zoneId <= 8) {
+                        leftZonesContainer.appendChild(zoneDiv);
+                    } else {
+                        rightZonesContainer.appendChild(zoneDiv);
+                    }
+                });
+            }
+
+
+
+
+
+            window.defaultUI = function(){
+                const leftZonesContainer = document.getElementById('leftZones');
+          const rightZonesContainer = document.getElementById('rightZones');
+          for (let i = 1; i <= 16; i++) {
+            const zone = {
+              id: i,
+              activated: false,
+              selectedDevice: null,
+              buzzerStatus: 'off'
+            };
+            zones.push(zone);
+      
+            const zoneDiv = document.createElement('div');
+            zoneDiv.className = 'zone';
+            zoneDiv.id = `zone-${i}`;
+            zoneDiv.innerHTML = `
+              <label for="zone-${i}-select">Zone ${i}</label>
+              <div class="toggle-switch-container">
+                <div class="toggle-switch">
+                  <label class="toggle-slider">
+                    <input type="checkbox" onchange="toggleZone(${i})">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <select id="zone-${i}-select" onchange="handleDeviceChange(${i})" disabled>
+                  <option value="" selected disabled>Select Device</option>
+                  ${devices.map(device => `<option value="${device}">${device.toUpperCase()}</option>`).join('')}
+                </select>
+              </div>
+              <div class="buzzer-switch-container">
+                <div class="buzzer-switch">
+                  <input type="checkbox" id="zone-${i}-buzzer-switch" onchange="toggleBuzzer(${i})" disabled>
+                  <label for="zone-${i}-buzzer-switch">Buzzer: Off</label>
+                </div>
+              </div>
+              <button id="zone-${i}-buzzer-btn" style="display: none;"></button>
+            `;
+            if (i <= 8) {
+              leftZonesContainer.appendChild(zoneDiv);
+            } else {
+              rightZonesContainer.appendChild(zoneDiv);
+            }
+          }
+            }
+
+            window.toggleZone = function(zoneId) {
+                const zone = zones.find(z => z.zoneId === zoneId);
+                zone.activated = !zone.activated;
+                const selectElement = document.getElementById(`zone-${zoneId}-select`);
+                const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+
+                if (!selectElement || !buzzerSwitch) {
+                    console.error(`Error: Elements for zone ${zoneId} not found`);
+                    return;
+                }
+
+                selectElement.disabled = !zone.activated;
+                buzzerSwitch.disabled = !zone.activated;
+
+                if (zone.activated) {
+                    selectElement.removeAttribute('disabled');
+                    if (zone.selectedDevice) {
+                        buzzerSwitch.removeAttribute('disabled');
+                    }
+                } else {
+                    selectElement.disabled = true;
+                    buzzerSwitch.disabled = true;
+                }
+            }
+
+            window.toggleBuzzer = function(zoneId) {
+                const zone = zones.find(z => z.zoneId === zoneId);
+                const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+
+                if (!buzzerSwitch) {
+                    console.error(`Error: Buzzer switch for zone ${zoneId} not found`);
+                    return;
+                }
+
+                if (zone.selectedDevice) {
+                    zone.buzzerStatus = buzzerSwitch.checked ? 'on' : 'off';
+                    const buzzerLabel = document.querySelector(`#zone-${zoneId}-buzzer-switch + label`);
+                    if (buzzerLabel) {
+                        buzzerLabel.textContent = `Buzzer: ${zone.buzzerStatus.charAt(0).toUpperCase() + zone.buzzerStatus.slice(1)}`;
+                    } else {
+                        console.error(`Error: Buzzer label for zone ${zoneId} not found`);
+                    }
+                } else {
+                    buzzerSwitch.checked = false;
+                    buzzerSwitch.disabled = true;
+                }
+            }
+
+            window.handleDeviceChange = function(zoneId) {
+                const zone = zones.find(z => z.zoneId === zoneId);
+                const selectElement = document.getElementById(`zone-${zoneId}-select`);
+                if (!selectElement) {
+                    console.error(`Error: Select element for zone ${zoneId} not found`);
+                    return;
+                }
+                zone.selectedDevice = selectElement.value;
+                const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+
+                if (buzzerSwitch) {
+                    if (zone.selectedDevice) {
+                        buzzerSwitch.disabled = false;
+                    } else {
+                        buzzerSwitch.checked = false;
+                        buzzerSwitch.disabled = true;
+                    }
+                } else {
+                    console.error(`Error: Buzzer switch for zone ${zoneId} not found`);
+                }
+            }
+
+            window.saveZones = function() {
+                const result = zones.map(zone => ({
+                    zoneId: zone.zoneId,
+                    activated: zone.activated,
+                    selectedDevice: zone.selectedDevice,
+                    buzzerStatus: zone.buzzerStatus
+                }));
+                alert("Device Configaration Successfull Change");
+                
+
+
+                fetch('/update_zone', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(result)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data saved successfully');
+                    } else {
+                        console.error('Error saving data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving data:', error);
+                });
+                
+            }
+
+            function fetchInitialZones() {
+                fetch('/get_zone')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error fetching data');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.length === 0) {
+                            defaultUI();
+                        }else{
+                            zones = data;
+                            initializeZones();
+                        }
+                        
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        defaultUI();
+                    });
+            }
+
+            fetchInitialZones();
+        });
+    </script>
+</div>
+
+<script>
+    document.querySelectorAll('.submenu-toggle').forEach(item => {
+        item.addEventListener('click', event => {
+            event.preventDefault();
+            item.nextElementSibling.classList.toggle('show');
+        });
+    });
+
+    function Click(){
+        alert("yes its a w");   
+    }
+</script>
+
+{% endblock %}

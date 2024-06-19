@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/styles.css')}}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+    <link rel="icon" href="{{ url_for('static', filename='asset/TitleLogo.png') }}" type="image/x-icon" >
+</head>
+<body>
+    <div class="center">
+        <!-- <div class="container mh">Welcome to the Dexter WebServer</div> -->
+    <div class="container">
+        <div class="heading">Reset your password</div>
+        <form class="form" action="/resetpassword"  method="post">
+            <input 
+            placeholder="Username"
+            id="username"
+            name="username"
+            type="text"
+            class="input"
+            required=""/>
+
+            <input 
+            placeholder="Old Password"
+            id="password"
+            name="password"
+            type="password"
+            class="input"
+            required=""/>
+
+            <input 
+            placeholder="New Password"
+            id="password"
+            name="newpassword"
+            type="password"
+            class="input"
+            required=""/>
+
+            <input 
+            placeholder="Confirm New Password"
+            id="password"
+            name="cpassword"
+            type="password"
+            class="input"
+            required=""/>
+
+            <span class="forgot-password"><a href="/login"><b>Back to Login page?</b></a></span>
+            <input value="Submit" type="submit" class="login-button"/>
+        </form>
+    </div></div>
+    {% if wrong_password %}
+<script>
+  alert("username or password not found");
+</script>
+{% endif %}
+{% if not_same %}
+<script>
+  alert("your new password and confirm password are different");
+</script>
+{% endif %}
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,1 @@
+TABLE systemLogs (deviceType TEXT, logType TEXT, rtcYear INTEGER, rtcMonth INTEGER, rtcDate INTEGER, rtcHour INTEGER, rtcMinute INTEGER, rtcSecound INTEGER)

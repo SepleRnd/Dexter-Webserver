@@ -1,0 +1,99 @@
+
+{% extends "layout.html" %}
+{% block title %}eSim Settings{% endblock %}
+{% block body %}
+  
+      <!-- side-menu Ends -->
+      <div class="main-content">
+          
+          <div class= "path_content" id="path_content"> 
+                <div id="breadcrumbContainer"><h5>Network Settings > GSM Settings</h5></div>
+          </div>
+          
+        <div class="container">
+            <div class="control">
+                <h1>GSM Settings</h1>
+                <input type="checkbox" class="toggle-button" id="gsmToggle" >
+            </div>
+            <div class="status" id="status"></div>
+        </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+
+                function sendData(gsm_activated){
+                    var data ={
+                        "gsm_activated" : gsm_activated,
+                    };
+
+                    fetch('/netdata_gsm',{
+                        method: 'PUT',
+                        headers:{
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response=>{
+                        if(response.ok){
+                            console.log("Data sent")
+                        }else{
+                            console.log("Error sending data")
+                        }
+                    })
+                    .catch(error=>{
+                        console.log("Error sending data")
+                    })
+                }
+
+                function togglegsm(){
+                    var gsmToggle = document.getElementById("gsmToggle");
+                    var status = document.getElementById("status");
+                    if(gsmToggle.checked){
+                        sendData(true)
+                        status.textContent = "GSM Enabled"
+                    }else{
+                        sendData(false)
+                        status.textContent = "GSM Disabled"
+                    }
+                }
+
+                function initializegsm(){
+                    fetch('/get_gsm')
+                    .then(response=>{
+                        if(!response.ok){
+                            console.log("Error getting gsm status");
+                        }
+                        return response.json()
+                    })
+                    .then(data=>{
+                        var gsmToggle = document.getElementById("gsmToggle");
+                        var status = document.getElementById("status");
+
+                        var gsm_activated = parseInt(data[0][1]);
+
+                        gsmToggle.checked = gsm_activated;
+
+                        if(gsm_activated){
+                            status.textContent = "GSM Enabled"
+                        }else{
+                            status.textContent = "GSM Disabled"
+                        }
+                        
+                    })
+                    .catch(error=>{
+                        console.log("Error getting gsm status")
+                    })
+                }
+                initializegsm();
+
+                var gsmToggle = document.getElementById("gsmToggle");
+                if(gsmToggle){
+                    gsmToggle.addEventListener("change", togglegsm);
+                }
+            })
+        </script>
+    
+    <!-- <script src="{{url_for('static',filename='js/network.js')}}"></script> -->
+
+{% endblock %}

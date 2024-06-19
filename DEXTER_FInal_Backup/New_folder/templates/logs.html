@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}Device Logs Settings{% endblock %}
+{% block body %}
+
+<div class="main-content">
+
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>Events & logs > Logs</h5></div>
+    </div>
+
+    <div class="container">
+        <h1>Device Logs</h1>
+        <table id="logsTable">
+            <thead>
+                <tr>
+                    <th>Zone Number</th>
+                    <th>Device Name</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                {% for log in logs %}
+                    <tr>
+                        <td></td>
+                        <td>{{ log[0] }}</td>
+                        <td>{{ log[1] }}</td>
+                        <td>{{ log[4] }}</td>
+                        <td>{{ log[5] }}</td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+    <script src="{{url_for('static',filename='js/log.js')}}"></script>
+
+{% endblock %}

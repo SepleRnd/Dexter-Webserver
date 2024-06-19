@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+{% block title %}General Maintenance Settings{% endblock %}
+{% block body %}
+    <!-- side-menu Ends -->
+    <!-- main content start -->
+    <div class="main-content">
+        
+                  
+          <div class= "path_content" id="path_content"> 
+                <div id="breadcrumbContainer"><h5>System Settings > General</h5></div>
+          </div>
+          
+
+        
+      <div class="container">
+        <h1>Brand and Site Name Input</h1>
+        <form action="/general_data", method="post">
+            <div class="input-group">
+            <label for="brandName">Brand Name:</label>
+            <input type="text" value="{{user2[0][0]}}" name="brandName" id="brandName">
+        </div>
+        <div class="input-group">
+            <label for="siteName">Site Name:</label>
+            <input type="text" id="siteName" value="{{user2[0][1]}}" name="siteName">
+        </div>
+        <button type="submit">Save</button>
+        </form>
+        
+        <!-- <button onclick="printToConsole()">Save</button> change the button action -->
+<hr>
+        <h2>Clock</h2>
+        <div id="clock">00:00:00</div>
+        <div class="input-group">
+            <label for="setHours">Hours:</label>
+            <input type="number" id="setHours" class="clock-input" min="0" max="23">
+            <label for="setMinutes">Minutes:</label>
+            <input type="number" id="setMinutes" class="clock-input" min="0" max="59">
+            <label for="setSeconds">Seconds:</label>
+            <input type="number" id="setSeconds" class="clock-input" min="0" max="59">
+        </div>
+        <button onclick="setClock()">Set Clock</button>
+        <button onclick="startClock()">Start Clock</button>
+        <button onclick="stopClock()">Stop Clock</button>
+<hr>
+        <h2>Date Setup</h2>
+        <div class="input-group">
+            <label for="setDate">Set Date:</label>
+            <input type="date" id="setDate">
+        </div>
+        <button onclick="saveDate()">Save Date</button>
+        </div>
+    </div>
+
+    </div>
+
+
+
+    <script>
+        /*function printToConsole() {
+            const brandName = document.getElementById('brandName').value;
+            const siteName = document.getElementById('siteName').value;
+            console.log(`Brand Name: ${brandName}`);
+            console.log(`Site Name: ${siteName}`);
+        }*/
+
+        let clockInterval;
+        let hours = 0, minutes = 0, seconds = 0;
+
+        function startClock() {
+            if (clockInterval) return; // Prevent multiple intervals
+            clockInterval = setInterval(updateClock, 1000);
+        }
+
+        function stopClock() {
+            clearInterval(clockInterval);
+            clockInterval = null;
+        }
+
+        function setClock() {
+            hours = parseInt(document.getElementById('setHours').value) || 0;
+            minutes = parseInt(document.getElementById('setMinutes').value) || 0;
+            seconds = parseInt(document.getElementById('setSeconds').value) || 0;
+            updateClock();
+        }
+
+        function updateClock() {
+            seconds++;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes++;
+                if (minutes >= 60) {
+                    minutes = 0;
+                    hours++;
+                    if (hours >= 24) {
+                        hours = 0;
+                    }
+                }
+            }
+            document.getElementById('clock').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function saveDate() {
+            const setDate = document.getElementById('setDate').value;
+            console.log(`Selected Date: ${setDate}`);
+        }
+    </script>
+            
+    </div>
+    <!-- main content Ends -->
+    <script>
+      document.querySelectorAll(".submenu-toggle").forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.preventDefault();
+          item.nextElementSibling.classList.toggle("show");
+        });
+      });
+
+      const time = new Date().toLocaleTimeString();
+  document.getElementById("demo").innerHTML = time;
+  
+  const date = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const day= date.toLocaleDateString(undefined, options);
+    document.getElementById("demo2").innerHTML = day;
+
+
+
+    </script>
+    {% endblock %}

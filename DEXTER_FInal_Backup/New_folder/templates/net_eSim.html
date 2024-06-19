@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% block title %}eSim Settings{% endblock %}
+{% block body %}
+
+<div class="main-content">
+    
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>Network Settings > e-SIM</h5></div>
+    </div>
+    
+    <div class="esim_container">
+        <h1>e-SIM Management</h1>
+
+        <div class="esim-toggle">
+            <label for="esimToggle">Enable e-SIM:</label>
+            <label class="n-switch">
+                <input type="checkbox" id="esimToggle">
+                <span class="n-slider round"></span>
+            </label>
+        </div>
+
+        <div class="network-selection">
+            <label for="networkSelect">Select Network:</label>
+            <select id="networkSelect" disabled>
+                <option value="">--Select Network--</option>
+                <option value="Reliance JIO">Reliance JIO</option>
+                <option value="Vodafone">Vodafone</option>
+                <option value="Airtel">Airtel</option>
+            </select>
+        </div>
+
+        <div class="network-status">
+            <h2>Network Status</h2>
+            <p id="status"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function sendData(eSim_activated, select_network) {
+            var data = {
+                "eSim_activated": eSim_activated,
+                "select_network": select_network
+            };
+
+            fetch("/neteSim_data", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Data sent successfully");
+                } else {
+                    throw new Error("Failed to send data");
+                }
+            })
+            .catch(error => {
+                console.error("Error occurred while sending data:", error);
+            });
+        }
+        
+        function initializenetSim() {
+            fetch('/get_eSim')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to get data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var esimToggle = document.getElementById("esimToggle");
+                var networkSelect = document.getElementById("networkSelect");
+                var status = document.getElementById("status");
+        
+                // Assuming data is an array with two elements: [eSim_activated, select_network]
+                var eSim_activated = parseInt(data[0]);
+                var select_network = data[1];
+        
+                esimToggle.checked = eSim_activated;
+                networkSelect.disabled = !eSim_activated;
+        
+                if (eSim_activated) {
+                    networkSelect.value = select_network;
+                    updateNetworkStatus(select_network); // Update network status
+                    status.textContent = `Connected to ${data[0][1]}`;
+                }
+                else {
+                    networkSelect.value = "";
+                    status.textContent = 'eSIM is Disabled';
+                    updateNetworkStatus(select_network);
+                    
+                    
+    
+                }
+                console.log(data)
+            })
+            .catch(error => {
+                console.error("Error occurred while fetching data:", error);
+            });
+        }
+        
+        function toggleEsim() {
+            var esimToggle = document.getElementById("esimToggle");
+            var status = document.getElementById("status")
+            var networkSelect = document.getElementById("networkSelect");
+
+            if (esimToggle.checked) {
+                networkSelect.disabled = false;
+                sendData(true, networkSelect.value);
+                status.textContent = "eSIM is enable"
+            } else {
+                networkSelect.disabled = true;
+                networkSelect.value = "";
+                sendData(false, "");
+                status.textContent = 'eSIM is disable';
+            }
+        }
+
+        function updateNetworkStatus(selected_network) {
+            var status = document.getElementById("status");
+
+            if (selected_network) {
+                status.textContent = `Connected to ${selected_network}`;
+
+            }else{
+                status.textContent = 'eSIM is disabled';
+
+            }
+        }
+
+        // Initial setup
+        initializenetSim();
+
+        // Add event listeners
+        var esimToggle = document.getElementById("esimToggle");
+        var networkSelect = document.getElementById("networkSelect");
+
+        if (esimToggle) {
+            esimToggle.addEventListener("change", toggleEsim);
+        }
+
+        if (networkSelect) {
+            networkSelect.addEventListener("change", function() {
+                updateNetworkStatus(networkSelect.value);
+                sendData(true, networkSelect.value); // Send data when network is selected
+            });
+        }
+    });
+</script>
+
+{% endblock %}

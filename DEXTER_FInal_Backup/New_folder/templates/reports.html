@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Device Reports{% endblock %}
+{% block body %}
+
+    
+
+<div class="main-content">
+    
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>Events & Logs > Reports</h5></div>
+    </div>
+    
+    <div class="container">
+        <div class="selector-container">
+            <label for="reportType">Select report type:</label>
+            <select id="reportType">
+                <option value="daily">Daily Report</option>
+                <option value="monthly">Monthly Report</option>
+                <option value="quarterly">Quarterly Report</option>
+            </select>
+        </div>
+        <button id="downloadBtn">
+            <i class="fas fa-download"></i> Download Report
+        </button>
+    </div>
+</div>
+    <script src="{{url_for('static',filename='js/reports.js')}}"></script>
+{% endblock %}

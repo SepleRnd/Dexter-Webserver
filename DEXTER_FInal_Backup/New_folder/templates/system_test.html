@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}System Test{% endblock %}
+{% block body %}
+    <!-- side-menu Ends -->
+<!-- main content start -->
+
+
+<div class="main-content">
+
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>System Test > Tests</h5></div>
+    </div>
+
+<div class="container">
+    <h3>System Test</h3>
+    <div class="btn_content">
+        <form method="POST" action="/control">
+        <button class="btn" name="led" value="1">{{ 'Lamp Test ' + ('OFF' if led_states[1] else 'ON') }}</button>
+        <button class="btn" name="led" value="2">{{ 'Relay Test ' + ('OFF' if led_states[2] else 'ON') }}</button>
+        <button class="btn" name="led" value="3">{{ 'Buzzer Test ' + ('OFF' if led_states[3] else 'ON') }}</button>
+        </form>
+    </div>
+</div>
+  <script src="{{url_for('static',filename='js/system_test.js')}}"></script>
+  
+  </div>
+  
+    
+    
+    
+    
+    {% endblock %}
+

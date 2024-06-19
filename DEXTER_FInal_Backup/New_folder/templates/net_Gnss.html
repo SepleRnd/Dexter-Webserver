@@ -1,0 +1,115 @@
+
+{% extends "layout.html" %}
+{% block title %}eSim Settings{% endblock %}
+{% block body %}
+  
+
+<div class="main-content">
+    
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>Network Settings > Gnss </h5></div>
+    </div>
+    
+    <div class="container">
+        <div class="control">
+            <h1>GNSS Settings</h1>
+            <input type="checkbox" class="toggle-button" id="gnssToggle">
+        </div>
+        <div class="status" id="status"></div>
+    </div>
+    </div>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function(){
+            function sendData(gnss_activated){
+
+                var data ={
+                    "gnss_activated" : gnss_activated,
+                };
+                
+                fetch("/net_gnss", {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response=>{
+                    if(response.ok){
+                        console.log("data sent successfully");
+                    }else{
+                        console.log("Error sending data");
+                    }
+                })
+                .catch(error=>{
+                    console.log("Error sending data");
+                })
+            }
+
+            function togglegnss(){
+                var gnssToggle = document.getElementById("gnssToggle");
+                var status = document.getElementById("status")
+                if(gnssToggle.checked){
+                    sendData(true);
+                    status.textContent = "GNSS is enabled"
+                }else{
+                    sendData(false);
+                    status.textContent = "GNSS is disabled"
+                }
+
+            }
+
+            function initializegnss(){
+                fetch('/get_gnss')
+                .then(response=>{
+                    if (!response.ok){
+                        throw new Error('Faild to get data')
+                    }
+                    return response.json();
+
+                })
+                .then(data=>{
+                    var gnssToggle = document.getElementById("gnssToggle");
+                    var status = document.getElementById("status");
+
+                    var gnss_activated = parseInt(data[0][1]);
+
+                    gnssToggle.checked = gnss_activated;
+                    
+                    if(gnss_activated){
+                        status.textContent = "GNSS is enabled"
+                    }else{
+                        status.textContent = "GNSS is disabled"
+                    }
+
+                    console.log(data)
+                })
+                .catch(error=>{
+                    console.log("Error getting data")
+                })
+            }
+
+            initializegnss();
+
+            var gnssToggle = document.getElementById("gnssToggle");
+
+            if(gnssToggle){
+                gnssToggle.addEventListener("change", togglegnss);
+            }
+        
+        })
+
+        
+
+
+
+       
+
+
+
+    </script>
+    
+
+<!-- <script src="{{url_for('static',filename='js/network.js')}}"></script>  -->
+
+{% endblock %}

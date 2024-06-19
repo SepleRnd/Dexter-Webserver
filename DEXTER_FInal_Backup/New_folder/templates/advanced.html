@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Advanced Maintenance Settings{% endblock %}
+{% block body %}
+
+
+<!-- main content start -->
+
+
+<!-- main content start -->
+
+<div class="main-content">
+    
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>System Settings > Advance Settings</h5></div>
+    </div>
+    
+    <div class="button-container">
+        <button class="setup-button">
+            <i class="fas fa-cogs"></i>
+            <span>Setup Mode</span>
+        </button>
+        <button class="reset-button">
+            <i class="fas fa-undo-alt"></i>
+            <span>Reset to Default</span>
+        </button>
+    </div>
+
+
+</div>      
+<!-- main content Ends -->
+    <script>
+        document.querySelectorAll('.submenu-toggle').forEach(item => {
+            item.addEventListener('click', event => {
+                event.preventDefault();
+                item.nextElementSibling.classList.toggle('show');
+            });
+        });
+        
+    </script>
+
+
+
+{% endblock %}

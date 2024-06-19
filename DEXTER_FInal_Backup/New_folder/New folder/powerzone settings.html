@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Side Menu</title>
+    <link rel="stylesheet" href="/styles/Device_config.css">
+
+</head>
+<body>
+<!-- navbar start -->
+
+<div class="topnav" id="myTopnav">
+    <img class="logo" src="/Assets/Logo_main.png">
+    <div class="dropdown2">
+      <button class="dropbtn2">Dropdown
+        <i class="fa fa-caret-down"></i>
+      </button>
+      <div class="dropdown-content2">
+        <a href="#">User Detail</a>
+        <a href="#">Logout</a>
+      </div>
+    </div>
+    <a href="#alarm">Alarms</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+  </div>
+  
+  <!-- navbar end -->
+
+<!-- side-menu starts -->
+
+    <div class="side-menu">
+        
+        
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Device Configuration</a>
+            <div class="submenu">
+                <a href="Device_config.html">zone Settings</a>
+                <a href="powerzone settings.html">Power Zone Settings</a>
+                <a href="#">Output Management</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">EVents & Logs</a>
+            <div class="submenu">
+                <a href="#">Logs</a>
+                <a href="#">Event & Report</a>
+                
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Network Settings</a>
+            <div class="submenu">
+                <a href="#">e-Sim Settings</a>
+                <a href="#">GNSS Settings</a>
+                <a href="#">Lan Setup</a>
+                <a href="#">GSM Settings</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Device Integration</a>
+            <div class="submenu">
+                <a href="#">Integration Settings</a>
+                <a href="#">Device Management</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Power Management</a>
+            <div class="submenu">
+                <a href="#">Low Battery</a>
+                <a href="#">Power Backup Config</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">System Settings</a>
+            <div class="submenu">
+                <a href="General.html">General Maintenance</a>
+                <a href="Maintenance.html">Maintenance</a>
+                <a href="Advanced.html">Advanced Maintenance</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="system_test.html">System Test</a>
+
+        </div>
+
+        <div class="menu-item">
+            <a href="system_test.html" class="submenu-toggle">Protocol Settings</a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" >Device Provisioning</a>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" >OTA Update</a>
+        </div>
+
+
+    </div>
+
+    <!-- side-menu Ends -->
+
+
+<div class="main-content">
+    
+    
+
+      
+    <!-- toggle button Start -->
+    
+<div class="container">
+    <h1>Power Zone Selector</h1>
+    <div id="zonesContainer"></div>
+    <button class="save-button" onclick="saveZones()">Save Changes</button>
+</div>
+  
+  <script>
+    const devices = [' Burglar Alarm ', ' Fire Alarm ', ' Time Lock ', ' Access Control', 'NVR/DVR'];
+    const zones = [];
+  
+    function initializeZones() {
+      const zonesContainer = document.getElementById('zonesContainer');
+      for (let i = 1; i <= 8; i++) {
+        const zone = {
+          id: i,
+          activated: false,
+          selectedDevice: null,
+          buzzerStatus: 'off'
+        };
+        zones.push(zone);
+  
+        const zoneDiv = document.createElement('div');
+        zoneDiv.className = 'zone';
+        zoneDiv.id = `zone-${i}`;
+        zoneDiv.innerHTML = `
+          <label for="zone-${i}-select">Zone ${i}</label>
+          <div class="toggle-switch-container">
+            <div class="toggle-switch">
+              <label class="toggle-slider">
+                <input type="checkbox" onchange="toggleZone(${i})">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <select id="zone-${i}-select" onchange="handleDeviceChange(${i})" disabled>
+              <option value="" selected disabled>Select Device</option>
+              ${devices.map(device => `<option value="${device}">${device.toUpperCase()}</option>`).join('')}
+            </select>
+          </div>
+          <div class="buzzer-switch-container">
+            <div class="buzzer-switch">
+              <input type="checkbox" id="zone-${i}-buzzer-switch" onchange="toggleBuzzer(${i})" disabled>
+              <label for="zone-${i}-buzzer-switch">Buzzer: Off</label>
+            </div>
+          </div>
+          <button id="zone-${i}-buzzer-btn" style="display: none;"></button>
+        `;
+        zonesContainer.appendChild(zoneDiv);
+      }
+    }
+  
+    function toggleZone(zoneId) {
+      const zone = zones.find(z => z.id === zoneId);
+      zone.activated = !zone.activated;
+      const selectElement = document.getElementById(`zone-${zoneId}-select`);
+      const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+  
+      selectElement.disabled = !zone.activated;
+      buzzerSwitch.disabled = !zone.activated;
+  
+      if (zone.activated) {
+        selectElement.removeAttribute('disabled');
+        if (zone.selectedDevice) {
+          buzzerSwitch.removeAttribute('disabled');
+        }
+      } else {
+        selectElement.disabled = true;
+        buzzerSwitch.disabled = true;
+      }
+    }
+  
+    function toggleBuzzer(zoneId) {
+      const zone = zones.find(z => z.id === zoneId);
+      const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+  
+      if (zone.selectedDevice) {
+        zone.buzzerStatus = buzzerSwitch.checked ? 'on' : 'off';
+        const buzzerLabel = document.querySelector(`#zone-${zoneId}-buzzer-switch + label`);
+        buzzerLabel.textContent = `Buzzer: ${zone.buzzerStatus.charAt(0).toUpperCase() + zone.buzzerStatus.slice(1)}`;
+      } else {
+        // Disable buzzer switch if no device is selected
+        buzzerSwitch.checked = false;
+        buzzerSwitch.disabled = true;
+      }
+    }
+  
+    function handleDeviceChange(zoneId) {
+      const zone = zones.find(z => z.id === zoneId);
+      const selectElement = document.getElementById(`zone-${zoneId}-select`);
+      zone.selectedDevice = selectElement.value;
+      const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+  
+      // Enable buzzer switch if a device is selected
+      if (zone.selectedDevice) {
+        buzzerSwitch.disabled = false;
+      } else {
+        // Disable buzzer switch if no device is selected
+        buzzerSwitch.checked = false;
+        buzzerSwitch.disabled = true;
+      }
+    }
+
+    function saveZones() {
+    const result = zones.map(zone => ({
+      zoneId: zone.id,
+      activated: zone.activated,
+      selectedDevice: zone.selectedDevice,
+      buzzerStatus: zone.buzzerStatus
+    }));
+    console.log(result);
+    // Here you can replace the console.log with (mongoDB code/AJAX) request to save the data to the server
+  }
+
+  
+    window.onload = initializeZones;
+  </script>
+
+
+</body>
+</html>

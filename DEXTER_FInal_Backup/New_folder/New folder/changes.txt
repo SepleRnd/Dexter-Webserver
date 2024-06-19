@@ -1,0 +1,173 @@
+<!-- side-menu starts -->
+
+    <div class="side-menu">
+        
+        
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Device Configuration</a>
+            <div class="submenu">
+                <a href="Device_config.html">zone Settings</a>
+                <a href="powerzone settings.html">Power Zone Settings</a>
+                <a href="#">Output Management</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Events & Logs</a>
+            <div class="submenu">
+                <a href="/html/logs.html">Logs</a>
+                <a href="/html/reports.html">Event & Report</a>
+                
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Network Settings</a>
+            <div class="submenu">
+                <a href="/html/net_eSim.html">e-Sim Settings</a>
+                <a href="/html/net_Gnss.html">GNSS Settings</a>
+                <a href="/html/Lan.html">Lan Setup</a>
+                <a href="/html/net_Gsm.html">GSM Settings</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Device Integration</a>
+            <div class="submenu">
+                <a href="#">Integration Settings</a>
+                <a href="#">Device Management</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">Power Management</a>
+            <div class="submenu">
+                <a href="#">Low Battery</a>
+                <a href="#">Power Backup Config</a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <a href="#" class="submenu-toggle">System Settings</a>
+            <div class="submenu">
+                <a href="General.html">General Maintenance</a>
+                <a href="Advanced.html">Advanced Maintenance</a>
+            </div>
+        </div>
+
+  <div class="menu-item">
+      <a href="/html/system_test.html">System test</a>
+  </div>
+
+  <div class="menu-item">
+      <a href="#">Protocol Settings</a>
+  </div>
+
+  <div class="menu-item">
+      <a href="#">Device Provisioning</a>
+  </div>
+
+  <div class="menu-item">
+      <a href="#">OTA Update</a>
+  </div>
+
+  <div class="menu-item">
+    <a href="system_test.html" class="submenu-toggle">System main  </a>
+    <!-- <div class="submenu">
+        <a href="system_test.html">Test</a>
+    </div> -->
+</div>
+
+
+    </div>
+
+    <!-- side-menu Ends -->
+
+
+css----------------------------
+
+
+
+/* sidebar menu starts */
+
+.side-menu {
+    width: 250px;
+    position: fixed;
+    height: 100%;
+    background-color: #FFFFFF;
+    color: #3c00ff;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    box-shadow: 5px 15px 10px  #ebebeb;
+}
+
+::-webkit-scrollbar { 
+    display: none;
+}
+
+.side-menu .menu-item {
+    padding: 20px 20px;
+    cursor: pointer;
+}
+
+
+
+.side-menu .menu-item a {
+    color: #000000;
+    text-decoration: none;
+    display: block;
+}
+
+.side-menu .submenu {
+    display: none;
+    flex-direction: column;
+    padding-left: 20px;
+    padding-top: 10px;
+    background-color: #f0f0f0;
+}
+
+
+.side-menu .submenu a:hover {font-weight: 550;}
+
+.side-menu .submenu a {
+    padding: 15px 0;
+}
+
+/* .side-menu .submenu.show {
+    display: flex;
+} */
+
+.side-menu .menu-item .submenu-toggle:hover{
+  width:max-content;
+  font-weight:550;
+}
+
+.side-menu .menu-item a:hover {
+  width:  max-content;
+  font-weight:550;
+}
+
+ .side-menu .menu-item:hover {background-color: #f0f0f0;
+} 
+
+.side-menu .menu-item:focus-within {background-color: #f0f0f0;}  
+
+
+
+.menu-item:focus-within .submenu {
+  display: flex;
+}
+
+
+.main-content {
+    margin-left: 250px; /* Same as the width of the side menu */
+    padding: 20px;
+    overflow-y: auto; /* Enable scrolling for the main content */
+    flex: 1;
+}
+
+/* sidebar menu Ends */
+
+

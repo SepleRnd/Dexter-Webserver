@@ -1,0 +1,251 @@
+{% extends "layout.html" %}
+{% block title %}Device Zone Settingss{% endblock %}
+{% block body %}
+<div class="main-content">
+    
+    <div class= "path_content" id="path_content"> 
+        <div id="breadcrumbContainer"><h5>Device Config > Zone Setings</h5></div>
+    </div>
+    
+    <div class="container">
+        <h1>Device Zone Selector</h1>
+        <div id="zonesContainer"></div>
+        <button class="save-button" onclick="saveZones()">Save</button>
+    </div>
+</div>
+<script>
+    const devices = ['Burglar Alarm', 'Fire Alarm', 'Time Lock', 'ACCESS CONTROL', 'I.A.S'];
+    let zones = [];
+  
+    function initializeZones() {
+        fetch('/get_zone')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error fetching zones");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Received data from server:", data);
+                zones = data.map((item, index) => ({
+                    zoneId: index + 1,
+                    activated: parseInt(item[1]),
+                    selectedDevice: item[2],
+                    buzzerStatus: item[3]
+                }));
+                updateZoneUI();
+            })
+            .catch(error => {
+                console.error("Error fetching zones:", error);
+                defaultZoneUI();
+            });
+    }
+    
+    
+    
+
+    function defaultZoneUI() {
+        const zonesContainer = document.getElementById('zonesContainer');
+        for (let i = 1; i <= 16; i++) {
+            const zone = {
+                zoneId: i,
+                activated: 0, // Set to 0 initially for off
+                selectedDevice: null,
+                buzzerStatus: 'off'
+            };
+            zones.push(zone);
+            createZoneElement(zone, zonesContainer);
+        }
+    }
+
+    function updateZoneUI() {
+        const zonesContainer = document.getElementById('zonesContainer');
+        zonesContainer.innerHTML = ''; // Clear existing zones
+        for (let i = 1; i <= 16; i++) {
+            const zone = zones.find(z => z.zoneId === i);
+            if (zone) {
+                createZoneElement(zone, zonesContainer);
+            } else {
+                createEmptyZoneElement(i, zonesContainer);
+            }
+        }
+    }
+
+    function createZoneElement(zone, container) {
+        const zoneDiv = document.createElement('div');
+        zoneDiv.className = 'zone';
+        zoneDiv.id = `zone-${zone.zoneId}`;
+
+        let deviceOptions = devices;
+        if([7,8,15,16].includes(zone.zoneId)){
+            deviceOptions = ['CCTV']
+        }
+
+
+        zoneDiv.innerHTML = `
+        <label for="zone-${zone.zoneId}-select">Zone ${zone.zoneId}</label>
+        <div class="toggle-switch-container">
+            <div class="toggle-switch">
+                <label class="toggle-slider">
+                    <input type="checkbox" ${zone.activated ? 'checked' : ''} onchange="toggleZone(${zone.zoneId})">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <select id="zone-${zone.zoneId}-select" onchange="handleDeviceChange(${zone.zoneId})" ${zone.activated ? '' : 'disabled'}>
+                <option value="" selected disabled>Select Device</option>
+                ${deviceOptions.map(device => `<option value="${device}" ${zone.selectedDevice === device ? 'selected' : ''}>${device}</option>`).join('')}
+            </select>
+        </div>
+        <div class="buzzer-switch-container">
+            <div class="buzzer-switch">
+                <input type="checkbox" id="zone-${zone.zoneId}-buzzer-switch" ${zone.buzzerStatus === 'on' ? 'checked' : ''} onchange="toggleBuzzer(${zone.zoneId})" ${zone.activated && zone.selectedDevice ? '' : 'disabled'}>
+                <label for="zone-${zone.zoneId}-buzzer-switch">Buzzer: ${zone.buzzerStatus.charAt(0).toUpperCase() + zone.buzzerStatus.slice(1)}</label>
+            </div>
+        </div>
+    `;
+        container.appendChild(zoneDiv);
+    }
+
+    function createEmptyZoneElement(zoneId, container) {
+        const zoneDiv = document.createElement('div');
+        zoneDiv.className = 'zone';
+        zoneDiv.id = `zone-${zoneId}`;
+        
+        zoneDiv.innerHTML = `
+            <label for="zone-${zoneId}-select">Zone ${zoneId}</label>
+            <div class="toggle-switch-container">
+                <div class="toggle-switch">
+                    <label class="toggle-slider">
+                        <input type="checkbox" onchange="toggleZone(${zoneId})">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <select id="zone-${zoneId}-select" onchange="handleDeviceChange(${zoneId})" disabled>
+                    <option value="" selected disabled>Select Device</option>
+                    ${devices.map(device => `<option value="${device}">${device}</option>`).join('')}
+                </select>
+            </div>
+            <div class="buzzer-switch-container">
+                <div class="buzzer-switch">
+                    <input type="checkbox" id="zone-${zoneId}-buzzer-switch" onchange="toggleBuzzer(${zoneId})" disabled>
+                    <label for="zone-${zoneId}-buzzer-switch">Buzzer: Off</label>
+                </div>
+            </div>
+        `;
+        container.appendChild(zoneDiv);
+    }
+
+    function toggleZone(zoneId) {
+        let zone = zones.find(z => z.zoneId === zoneId);
+        if (!zone) {
+            zone = {
+                zoneId: zoneId,
+                activated: 1, // Set to 1 for on
+                selectedDevice: null,
+                buzzerStatus: 'off'
+            };
+            zones.push(zone);
+            updateZoneUI(); // Update the UI to reflect the new zone
+        } else {
+            zone.activated = zone.activated === 1 ? 0 : 1; // Toggle between 1 and 0
+        }
+
+        const selectElement = document.getElementById(`zone-${zoneId}-select`);
+        const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+
+        selectElement.disabled = !zone.activated;
+        buzzerSwitch.disabled = !zone.activated || !zone.selectedDevice;
+
+        if (zone.activated) {
+            selectElement.removeAttribute('disabled');
+            if (zone.selectedDevice) {
+                buzzerSwitch.removeAttribute('disabled');
+            }
+        } else {
+            selectElement.disabled = true;
+            buzzerSwitch.disabled = true;
+        }
+
+        // Send a PUT request to the /update_zone endpoint to update the state of the zone in the database
+        fetch('/update_zone', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify([zone]),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error updating zone");
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+
+    function toggleBuzzer(zoneId) {
+        const zone = zones.find(z => z.zoneId === zoneId);
+        if (!zone) {
+            console.error(`Zone with id ${zoneId} not found`);
+            return;
+        }
+        const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+
+        if (zone.selectedDevice) {
+            zone.buzzerStatus = buzzerSwitch.checked ? 'on' : 'off';
+            const buzzerLabel = document.querySelector(`#zone-${zoneId}-buzzer-switch + label`);
+            buzzerLabel.textContent = `Buzzer: ${zone.buzzerStatus.charAt(0).toUpperCase() + zone.buzzerStatus.slice(1)}`;
+        }
+    }
+
+    function handleDeviceChange(zoneId) {
+        const zone = zones.find(z => z.zoneId === zoneId);
+        if (!zone) {
+            console.error(`Zone with id ${zoneId} not found`);
+            return;
+        }
+        const selectElement = document.getElementById(`zone-${zoneId}-select`);
+        zone.selectedDevice = selectElement.value;
+        const buzzerSwitch = document.getElementById(`zone-${zoneId}-buzzer-switch`);
+
+        if (zone.selectedDevice) {
+            buzzerSwitch.disabled = false;
+        } else {
+            buzzerSwitch.checked = false;
+            buzzerSwitch.disabled = true;
+        }
+    }
+
+    function saveZones() {
+        const result = zones.map(zone => ({
+            zoneId: zone.zoneId,
+            activated: zone.activated,
+            selectedDevice: zone.selectedDevice,
+            buzzerStatus: zone.buzzerStatus
+        }));
+        console.log(result);
+        
+        fetch('/update_zone', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(result),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Server error");
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        alert("Your selected options are saved")  
+    } 
+
+    window.onload = initializeZones;
+</script>
+{% endblock %}
+

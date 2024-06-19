@@ -1,0 +1,194 @@
+
+{% extends "layout.html" %}
+{% block title %}eSim Settings{% endblock %}
+{% block body %}
+  
+  
+  <div class="main-content">
+      
+            <div class= "path_content" id="path_content"> 
+                <div id="breadcrumbContainer"><h5>Network Settings > LAN setup</h5></div>
+            </div>
+      
+          <!-- toggle button Start -->
+  
+          <div class="lan-container">
+              
+              
+            <h2>LAN Setup</h2>
+            <form class="lan-setup" action="/data_lan" method="POST">
+                <label for="ip-address">SET IP ADDRESS </label>
+                <input type="text" name="set_ip_address"  id="ip-address" value="{{user2[0][0]}}">
+                
+                <label for="port-number">SET PORT NUMBER</label>
+                <input type="text" name="set_port_no" id="port-number" value="{{user2[0][1]}}">
+                
+                <label for="subnet-mask">SUBNET MASK</label>
+                <input type="text" name="subnet_mask" id="subnet-mask" value="{{user2[0][2]}}">
+                
+                <label for="gateway">GATEWAY</label>
+                <input type="text" name="gate_way" id="gateway" value="{{user2[0][3]}}">
+                
+                <label for="dns-setup">DNS SETUPS</label>
+                <input type="text" name="dns_setups" id="dns-setup" value="{{user2[0][4]}}">
+                
+                <label for="apn-settings">APN SETTINGS</label>
+                <input type="text" name="apn_settings" id="apn-settings" value="{{user2[0][5]}}">
+                <button type="submit" id="save-btn" onclick="saveConfiguration()">Save</button>
+            </form>
+    
+            <h2>LAN CONFIGURATION</h2>
+            <div class="lan-configuration">
+                <div class="switch-container">
+                    <label>NETWORK LED STATUS</label>
+                    <div class="switch">
+                        <input  type="checkbox" id="network_toggle">
+                        <label for="network_toggle" class="slider"></label>
+                    </div>
+                </div>
+    
+                <div class="switch-container">
+                    <label>WIRELESS LAN</label>
+                    <div class="switch">
+                        <input  type="checkbox" id="wireless_toggle">
+                        <label for="wireless_toggle" class="slider"></label>
+                    </div>
+                </div>
+    
+                <div class="switch-container">
+                    <label>IP MODULE</label>
+                    <div class="switch">
+                        <input  type="checkbox" id="ip_module_toggle">
+                        <label for="ip_module_toggle" class="slider"></label>
+                    </div>
+                </div>
+    
+                <div class="switch-container">
+                    <label>STATIC / DYNAMIC</label>
+                    <div class="switch">
+                        <input  type="checkbox" id="static_dynamic_toggle">
+                        <label for="static_dynamic_toggle" class="slider"></label>
+                    </div>
+                </div>
+    
+                <div class="network-test-container">
+                    <label>NETWORK TEST</label>
+                    <div class="network-test">
+                        <span id="network-status">CONNECTED</span>
+                        <button id="network-test-btn" onclick="networkTest()">&#8635;</button>
+                    </div>
+                </div>
+            </div>
+               
+        </div>
+        </div>
+
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+                function sendData(network_led_sts, wireless_lan, ip_module, static_or_dynamic){
+
+                    var data={
+                        "network_led_sts": network_led_sts,
+                        "wireless_lan": wireless_lan,
+                        "ip_module": ip_module,
+                        "static_or_dynamic": static_or_dynamic
+                    };
+                    fetch("/data2_lan",{
+                        method:"PUT",
+                        headers:{
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response=>{
+                        if(response.ok){
+                            console.log("data sent")
+                        }else{
+                            console.log("error sending data")
+                        }
+                    })
+                    
+                }
+                
+
+                function togglenet(){
+                    var network_toggle = document.getElementById("network_toggle").checked;
+                    var wireless_toggle = document.getElementById("wireless_toggle").checked;
+                    var ip_module_toggle = document.getElementById("ip_module_toggle").checked;
+                    var static_dynamic_toggle = document.getElementById("static_dynamic_toggle").checked;
+                    
+                    sendData(network_toggle,wireless_toggle,ip_module_toggle,static_dynamic_toggle)
+                }
+                /*function togglenet2(){
+                    var wireless_lan = document.getElementById("wireless_lan").checked;
+                    sendData(togglenet2)
+                }*/
+
+                function initializelan(){
+                    fetch('/get_data2lan')
+                    .then(response=>{
+                        if(!response.ok){
+                            console.log("Error getting lan status");
+                        }
+                        return response.json()
+                    })
+                    .then(data=>{
+                        var network_toggle= document.getElementById("network_toggle");
+                        var wireless_toggle = document.getElementById("wireless_toggle");
+                        var ip_module_toggle = document.getElementById("ip_module_toggle");
+                        var static_dynamic_toggle = document.getElementById("static_dynamic_toggle");
+                        
+                        var network_led_sts= parseInt(data[0][0]);
+                        var wireless_lan= parseInt(data[0][1]);
+                        var ip_module= parseInt(data[0][2]);
+                        var static_or_dynamic= parseInt(data[0][3]);
+
+                        network_toggle.checked = network_led_sts;
+                        wireless_toggle.checked = wireless_lan;
+                        ip_module_toggle.checked = ip_module;
+                        static_dynamic_toggle.checked = static_or_dynamic;
+
+                        
+
+
+                        console.log(data)
+                    })
+                    .catch(error => {
+                        console.log("Error parsing JSON:", error);
+                    });
+                    
+                }
+
+
+
+
+                var network_toggle = document.getElementById("network_toggle");
+                var wireless_toggle = document.getElementById("wireless_toggle");
+                var ip_module_toggle = document.getElementById("ip_module_toggle");
+                var static_dynamic_toggle = document.getElementById("static_dynamic_toggle");
+
+           
+                   
+                if(network_toggle && wireless_toggle && ip_module_toggle && static_dynamic_toggle){
+                    network_toggle.addEventListener("change", togglenet)
+                    wireless_toggle.addEventListener("change", togglenet)
+                    ip_module_toggle.addEventListener("change", togglenet)
+                    static_dynamic_toggle.addEventListener("change", togglenet)
+                }
+
+                initializelan();
+            })
+        </script>
+
+        
+        {% if lansetup %}
+            <script>
+                alert("Setup");
+            </script>
+        {% endif %}
+        
+
+       <!-- <script src="{{url_for('static',filename='js/network.js')}}"></script>  
+        
+        {% endblock %}
